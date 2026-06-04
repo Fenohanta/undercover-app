@@ -1,14 +1,25 @@
-# Dépendances
+﻿# Dependances
 node_modules
 
 # Build
 dist
 dist-ssr
+dev-dist
+*.tsbuildinfo
 
-# Variables d'environnement — NE JAMAIS COMMITTER
+# Claude Code
+.claude/
+
+# Variables d'environnement - NE JAMAIS COMMITTER
 .env
 .env.local
 .env.*.local
+
+# Vercel
+.vercel/
+
+# Tests / Couverture
+coverage/
 
 # Logs
 logs
@@ -18,10 +29,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Éditeurs
+# Editeurs
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
@@ -31,6 +42,4 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
-
-# PWA
-dev-dist
+Desktop.ini
