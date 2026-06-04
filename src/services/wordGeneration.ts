@@ -1,8 +1,9 @@
 import type { WordPair } from '../types/game';
 import { pickRandomWordPair } from '../utils/gameLogic';
+import { buildWordPairPrompt } from './prompts';
 
 const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
 
 export async function generateWordPairFromTheme(theme: string): Promise<WordPair> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -11,22 +12,7 @@ export async function generateWordPairFromTheme(theme: string): Promise<WordPair
     throw new Error('Clé API Gemini manquante. Vérifiez votre fichier .env.local.');
   }
 
-  const prompt = `Tu es un générateur de paires de mots pour le jeu Undercover.
-
-Le thème choisi par les joueurs est : "${theme}"
-
-Génère UNE paire de mots respectant ces règles :
-1. Les deux mots appartiennent à l'univers du thème.
-2. Les mots sont proches mais distincts (pas de synonymes exacts, pas trop éloignés).
-3. Les mots doivent être des noms simples (1-3 mots maximum).
-
-Exemples :
-- Thème "Harry Potter" → civil: "Gryffondor", undercover: "Serdaigle"
-- Thème "Cuisine japonaise" → civil: "Ramen", undercover: "Udon"
-- Thème "Années 80" → civil: "Walkman", undercover: "Discman"
-
-Réponds UNIQUEMENT avec un objet JSON, sans backticks, sans explication :
-{"civil": "...", "undercover": "...", "category": "${theme}"}`;
+  const prompt = buildWordPairPrompt(theme);
 
   const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
     method: 'POST',
