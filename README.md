@@ -1,5 +1,7 @@
 # 🕵️ Undercover
 
+**Version 0.1.0** · [undercover-app-tau.vercel.app](https://undercover-app-tau.vercel.app/)
+
 Jeu de déduction sociale jouable à plusieurs sur un seul téléphone (mode Pass & Play).
 
 ## Comment jouer
