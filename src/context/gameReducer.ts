@@ -2,7 +2,7 @@ import type { GameState, GameConfig, WordPair } from '../types/game';
 import { assignRoles, checkWinCondition, generateSpeakingOrder } from '../utils/gameLogic';
 
 export type GameAction =
-  | { type: 'START_GAME'; payload: { config: GameConfig; wordPair: WordPair } }
+  | { type: 'START_GAME'; payload: { config: GameConfig; wordPair: WordPair; playerNames: string[] } }
   | { type: 'CONFIRM_WORD_SEEN' }
   | { type: 'START_ROUND' }
   | { type: 'ELIMINATE_PLAYER'; payload: { playerId: number } }
@@ -34,7 +34,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'START_GAME': {
       const { config, wordPair } = action.payload;
-      const players = assignRoles(config, wordPair);
+      const players = assignRoles(config, wordPair, action.payload.playerNames);
       return {
         ...state,
         phase: 'distribution',

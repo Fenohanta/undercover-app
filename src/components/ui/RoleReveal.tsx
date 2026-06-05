@@ -41,9 +41,11 @@ export function RoleReveal({ player, onConfirm }: RoleRevealProps) {
       ) : (
         <div className="w-full max-w-sm">
           <div className="bg-gray-900 border border-gray-700 rounded-3xl p-8 mb-6">
-            <p className={`text-xl font-semibold mb-4 ${color}`}>
-              {emoji} {label}
-            </p>
+            {player.role === 'mrwhite' && (
+              <p className={`text-xl font-semibold mb-4 ${color}`}>
+                {emoji} {label}
+              </p>
+            )}
             {player.word ? (
               <p className="text-white text-4xl font-bold tracking-wide">{player.word}</p>
             ) : (

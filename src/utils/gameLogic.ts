@@ -17,7 +17,7 @@ export function pickRandomWordPair(category?: string): WordPair {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-export function assignRoles(config: GameConfig, wordPair: WordPair): Player[] {
+export function assignRoles(config: GameConfig, wordPair: WordPair, playerNames: string[]): Player[] {
   const { playerCount, undercoverCount, hasMrWhite } = config;
 
   const roles: Role[] = [];
@@ -34,7 +34,7 @@ export function assignRoles(config: GameConfig, wordPair: WordPair): Player[] {
 
   return shuffledRoles.map((role, index) => ({
     id: index + 1,
-    name: `Joueur ${index + 1}`,
+    name: playerNames[index] || `Joueur ${index + 1}`,
     role,
     word: getWordForRole(role, wordPair),
     isEliminated: false,

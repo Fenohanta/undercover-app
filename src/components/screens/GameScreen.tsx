@@ -13,6 +13,7 @@ export function GameScreen() {
   const [pendingElimination, setPendingElimination] = useState<number | null>(null);
   const [mrWhiteGuess, setMrWhiteGuess] = useState('');
   const [mrWhiteResult, setMrWhiteResult] = useState<'win' | 'lose' | null>(null);
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
   const { players, speakingOrder, currentRound, selectedWordPair } = state;
   const activePlayers = players.filter(p => !p.isEliminated);
@@ -175,14 +176,31 @@ export function GameScreen() {
           })}
         </div>
 
-        <div className="space-y-3">
-          <Button fullWidth variant="danger" onClick={() => setLocalPhase('voting')}>
-            🗳️ Passer au vote
-          </Button>
-          <Button fullWidth variant="ghost" onClick={() => dispatch({ type: 'START_ROUND' })}>
-            🔄 Nouvelle manche
-          </Button>
-        </div>
+        {showQuitConfirm ? (
+          <div className="bg-gray-900 rounded-2xl p-6 text-center space-y-4">
+            <p className="text-white text-lg">Quitter la partie en cours ?</p>
+            <div className="flex gap-3">
+              <Button variant="ghost" fullWidth onClick={() => setShowQuitConfirm(false)}>
+                Annuler
+              </Button>
+              <Button variant="danger" fullWidth onClick={() => navigate('/setup')}>
+                Quitter
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Button fullWidth variant="danger" onClick={() => setLocalPhase('voting')}>
+              🗳️ Passer au vote
+            </Button>
+            <Button fullWidth variant="ghost" onClick={() => dispatch({ type: 'START_ROUND' })}>
+              🔄 Nouvelle manche
+            </Button>
+            <Button fullWidth variant="ghost" onClick={() => setShowQuitConfirm(true)}>
+              Quitter
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

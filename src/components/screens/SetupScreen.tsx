@@ -1,35 +1,63 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { WordPair } from '../../types/game';
 import { useGame } from '../../context/GameContext';
 import { ThemeSelector } from '../ui/ThemeSelector';
 import { Button } from '../ui/Button';
 
+type Step = 'players' | 'theme';
+
 export function SetupScreen() {
   const navigate = useNavigate();
   const { dispatch } = useGame();
 
+  const [step, setStep] = useState<Step>('players');
   const [playerCount, setPlayerCount] = useState(4);
   const [undercoverCount, setUndercoverCount] = useState(1);
   const [hasMrWhite, setHasMrWhite] = useState(false);
+  const [playerNames, setPlayerNames] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('undercover_player_names');
+      return saved ? JSON.parse(saved) : Array(4).fill('');
+    } catch {
+      return Array(4).fill('');
+    }
+  });
   const [wordPair, setWordPair] = useState<WordPair | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('undercover_player_names', JSON.stringify(playerNames));
+  }, [playerNames]);
 
   const maxUndercovers = playerCount - (hasMrWhite ? 1 : 0) - 2;
 
-  function handleUndercoverChange(val: number) {
-    setUndercoverCount(Math.min(val, maxUndercovers));
-  }
-
   function handlePlayerCountChange(val: number) {
     setPlayerCount(val);
+    setPlayerNames(prev => {
+      const next = [...prev];
+      while (next.length < val) next.push('');
+      return next.slice(0, val);
+    });
     const max = val - (hasMrWhite ? 1 : 0) - 2;
     setUndercoverCount(prev => Math.min(prev, max));
+  }
+
+  function handleUndercoverChange(val: number) {
+    setUndercoverCount(Math.min(val, maxUndercovers));
   }
 
   function handleMrWhiteToggle(checked: boolean) {
     setHasMrWhite(checked);
     const max = playerCount - (checked ? 1 : 0) - 2;
     setUndercoverCount(prev => Math.min(prev, max));
+  }
+
+  function handleNameChange(index: number, value: string) {
+    setPlayerNames(prev => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
   }
 
   function handleStart() {
@@ -39,9 +67,37 @@ export function SetupScreen() {
       payload: {
         config: { playerCount, undercoverCount, hasMrWhite, wordSource: wordPair.source ?? 'local' },
         wordPair,
+        playerNames,
       },
     });
     navigate('/distribution');
+  }
+
+  if (step === 'theme') {
+    return (
+      <div className="min-h-svh bg-gray-950 px-6 py-8">
+        <div className="max-w-sm mx-auto space-y-8">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setStep('players')} className="text-gray-400 text-2xl">←</button>
+            <h1 className="text-white text-2xl font-bold">Thème</h1>
+          </div>
+
+          <section>
+            <h2 className="text-gray-300 font-semibold mb-3">Mots du jeu</h2>
+            <ThemeSelector onWordPairReady={setWordPair} />
+            {wordPair && (
+              <p className="text-green-400 text-sm mt-2">
+                ✅ Mots prêts ({wordPair.source === 'ai-generated' ? `thème : ${wordPair.category}` : wordPair.category})
+              </p>
+            )}
+          </section>
+
+          <Button size="lg" fullWidth disabled={!wordPair} onClick={handleStart}>
+            Lancer la Distribution
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -49,13 +105,13 @@ export function SetupScreen() {
       <div className="max-w-sm mx-auto space-y-8">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/')} className="text-gray-400 text-2xl">←</button>
-          <h1 className="text-white text-2xl font-bold">Configuration</h1>
+          <h1 className="text-white text-2xl font-bold">Joueurs</h1>
         </div>
 
         {/* Nombre de joueurs */}
         <section>
           <h2 className="text-gray-300 font-semibold mb-3">
-            Joueurs : <span className="text-white">{playerCount}</span>
+            Nombre de joueurs : <span className="text-white">{playerCount}</span>
           </h2>
           <input
             type="range"
@@ -68,6 +124,21 @@ export function SetupScreen() {
           <div className="flex justify-between text-gray-500 text-xs mt-1">
             <span>3</span><span>12</span>
           </div>
+        </section>
+
+        {/* Noms des joueurs */}
+        <section className="space-y-2">
+          <h2 className="text-gray-300 font-semibold mb-3">Noms des joueurs</h2>
+          {playerNames.map((name, i) => (
+            <input
+              key={i}
+              type="text"
+              value={name}
+              onChange={e => handleNameChange(i, e.target.value)}
+              placeholder={`Joueur ${i + 1}`}
+              className="w-full bg-gray-900 border border-gray-700 text-white py-3 px-4 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-600"
+            />
+          ))}
         </section>
 
         {/* Nombre d'undercovers */}
@@ -109,7 +180,7 @@ export function SetupScreen() {
         </section>
 
         {/* Résumé des rôles */}
-        <div className="bg-gray-900 rounded-2xl p-4 text-sm space-y-1">
+        <div className="bg-gray-900 rounded-2xl p-4 text-sm">
           <p className="text-gray-400">
             <span className="text-blue-400 font-medium">
               {playerCount - undercoverCount - (hasMrWhite ? 1 : 0)} Civils
@@ -122,19 +193,8 @@ export function SetupScreen() {
           </p>
         </div>
 
-        {/* Sélecteur de mots */}
-        <section>
-          <h2 className="text-gray-300 font-semibold mb-3">Mots du jeu</h2>
-          <ThemeSelector onWordPairReady={setWordPair} />
-          {wordPair && (
-            <p className="text-green-400 text-sm mt-2">
-              ✅ Mots prêts ({wordPair.source === 'ai-generated' ? `thème : ${wordPair.category}` : wordPair.category})
-            </p>
-          )}
-        </section>
-
-        <Button size="lg" fullWidth disabled={!wordPair} onClick={handleStart}>
-          Lancer la Distribution
+        <Button size="lg" fullWidth onClick={() => setStep('theme')}>
+          Suivant →
         </Button>
       </div>
     </div>

@@ -19,7 +19,6 @@ export async function generateWordPairFromTheme(theme: string): Promise<WordPair
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { maxOutputTokens: 100, temperature: 0.9 },
     }),
   });
 

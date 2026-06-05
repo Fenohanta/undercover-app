@@ -22,6 +22,7 @@ export function HomeScreen() {
         <div className="text-gray-600 text-sm mt-8 space-y-1">
           <p>3 à 12 joueurs · Pass &amp; Play</p>
           <p>Un seul appareil suffit</p>
+          <p className="mt-2 text-gray-700">v{__APP_VERSION__}</p>
         </div>
       </div>
     </div>
