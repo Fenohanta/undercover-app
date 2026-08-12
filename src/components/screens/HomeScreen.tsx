@@ -14,14 +14,17 @@ export function HomeScreen() {
         </p>
       </div>
 
-      <div className="w-full max-w-xs space-y-4">
-        <Button size="lg" fullWidth onClick={() => navigate('/setup')}>
+      <div className="w-full max-w-xs space-y-3">
+        <Button size="lg" fullWidth onClick={() => navigate('/new-game')}>
           Nouvelle Partie
         </Button>
 
-        <div className="text-gray-600 text-sm mt-8 space-y-1">
-          <p>3 à 12 joueurs · Pass &amp; Play</p>
-          <p>Un seul appareil suffit</p>
+        <Button size="lg" fullWidth variant="secondary" onClick={() => navigate('/join')}>
+          Rejoindre une partie
+        </Button>
+
+        <div className="text-gray-600 text-sm mt-6 space-y-1">
+          <p>3 à 12 joueurs · Local &amp; En ligne</p>
           <p className="mt-2 text-gray-700">v{__APP_VERSION__}</p>
         </div>
       </div>
